@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3030;
+const Person = require("./models/person");
 
 app.use(cors());
 app.use(express.static("the_phonebook/build"));
@@ -36,10 +37,6 @@ let persons = [
   },
 ];
 
-app.get("/", (req, res) => {
-  res.send("<h3>Full Stack open Part 3</h3>");
-});
-
 app.get("/info", (req, res) => {
   res.send(`
     <p>Phonebook has info for ${persons.length} people</p>
@@ -48,7 +45,9 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Person.find({}).then((result) => {
+    res.json(result.map((item) => item.toJSON()));
+  });
 });
 
 app.get("/api/persons/:id", (req, res) => {
