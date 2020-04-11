@@ -99,7 +99,19 @@ app.post("/api/persons", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.put("/api/persons/:id", (req, res, next) => {
+  const body = req.body;
+  const person = {
+    number: body.number,
+  };
+  return Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then((result) => {
+      return res.json(result.toJSON());
+    })
+    .catch((error) => next(error));
+});
+
+app.delete("/api/persons/:id", (req, res, next) => {
   return Person.findByIdAndDelete(req.params.id)
     .then((result) => {
       console.log("Deleted successfully : ", result);
