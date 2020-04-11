@@ -8,10 +8,12 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "heroku": "^7.39.2",
     "nodemon": "^2.0.3"
   },
   "scripts": {
