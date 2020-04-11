@@ -5,6 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 3030;
 
 app.use(cors());
+app.use(express.static("the_phonebook/build"));
 app.use(express.json());
 
 morgan.token("body", (req, res) => (req.body ? JSON.stringify(req.body) : ""));

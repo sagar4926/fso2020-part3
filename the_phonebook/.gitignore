@@ -8,8 +8,8 @@
 # testing
 /coverage
 
-# production
-/build
+# production: Disabling to deploy build and serve via express
+# /build
 
 # misc
 .DS_Store
