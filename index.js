@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 3030;
 
-const persons = [
+let persons = [
   {
     name: "Arto Hellas",
     number: "040-123456",
@@ -49,6 +49,22 @@ app.get("/api/persons/:id", (req, res) => {
     });
   }
   res.json(person);
+});
+
+app.delete("/api/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+  
+  //Filtering first to avoid having two loops   
+  const others = persons.filter((person) => person.id !== id);
+
+  if (others.length === persons.length) {
+    return res.status(404).json({
+      error: "resource not found",
+    });
+  }
+  
+  persons = others;
+  res.status(204).end();
 });
 
 app.listen(PORT, () => {
