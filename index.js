@@ -89,27 +89,31 @@ app.post("/api/persons", (req, res) => {
     name: body.name,
     number: body.number,
   });
-  
+
   person.save().then((result) => {
     res.status(201).json(result.toJSON());
   });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-
-  //Filtering first to avoid having two loops
-  const others = persons.filter((person) => person.id !== id);
-
-  if (others.length === persons.length) {
-    return res.status(404).json({
-      error: "resource not found",
+  return Person.findByIdAndDelete(req.params.id)
+    .then((result) => {
+      console.log("Deleted successfully : ", result);
+      return res.status(204).end();
+    })
+    .catch((err) => {
+      console.log("Error deleting person: ", err);
+      return res.status(404).json({
+        error: "resource not found",
+      });
     });
-  }
-
-  persons = others;
-  res.status(204).end();
 });
+
+const catchAllEndpoints = (request, response) => {
+  response.status(404).json({ error: "url not found" });
+};
+//Catch all undefined urls and raise 404
+app.use(catchAllEndpoints);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
