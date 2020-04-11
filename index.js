@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const PORT = 3030;
 
+app.use(express.json());
+
 let persons = [
   {
     name: "Arto Hellas",
@@ -51,10 +53,17 @@ app.get("/api/persons/:id", (req, res) => {
   res.json(person);
 });
 
+app.post("/api/persons", (req, res) => {
+  const body = req.body;
+  body.id = parseInt(Math.random() * 100000);
+  persons = persons.concat(body);
+  res.status(201).json(body);
+});
+
 app.delete("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
-  
-  //Filtering first to avoid having two loops   
+
+  //Filtering first to avoid having two loops
   const others = persons.filter((person) => person.id !== id);
 
   if (others.length === persons.length) {
@@ -62,7 +71,7 @@ app.delete("/api/persons/:id", (req, res) => {
       error: "resource not found",
     });
   }
-  
+
   persons = others;
   res.status(204).end();
 });
