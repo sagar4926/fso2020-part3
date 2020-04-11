@@ -18,6 +18,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "web:logs": "heroku logs -t"
   }
 }
