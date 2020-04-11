@@ -37,11 +37,14 @@ let persons = [
   },
 ];
 
-app.get("/info", (req, res) => {
-  res.send(`
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${new Date()}</p>
-  `);
+app.get("/info", (req, res, next) => {
+  Person.countDocuments({})
+    .then((count) => {
+      res.send(
+        `<p>Phonebook has info for ${count} people</p><p>${new Date()}</p>`
+      );
+    })
+    .catch((err) => next(err));
 });
 
 app.get("/api/persons", (req, res, next) => {
@@ -77,14 +80,6 @@ app.post("/api/persons", (req, res, next) => {
       error: "missing required field `number`",
     });
   }
-
-  /* const existing = persons.find((person) => person.name === body.name);
-
-  if (existing) {
-    return res.status(409).json({
-      error: `name '${body.name}' already exists`,
-    });
-  } */
 
   const person = new Person({
     name: body.name,
