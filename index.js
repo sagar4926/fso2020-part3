@@ -44,25 +44,26 @@ app.get("/info", (req, res) => {
   `);
 });
 
-app.get("/api/persons", (req, res) => {
-  Person.find({}).then((result) => {
-    res.json(result.map((item) => item.toJSON()));
-  });
+app.get("/api/persons", (req, res, next) => {
+  Person.find({})
+    .then((result) => {
+      res.json(result.map((item) => item.toJSON()));
+    })
+    .catch((error) => next(error));
 });
 
-app.get("/api/persons/:id", (req, res) => {
-  return Person.findById(req.params.id)
+app.get("/api/persons/:id", (req, res, next) => {
+  Person.findById(req.params.id)
     .then((result) => {
+      if (!result) {
+        return next(new Error("Not Found"));
+      }
       return res.json(result);
     })
-    .catch((err) => {
-      return res.status(404).json({
-        error: "resource not found",
-      });
-    });
+    .catch((error) => next(error));
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const body = req.body;
 
   if (!body.name) {
@@ -90,9 +91,12 @@ app.post("/api/persons", (req, res) => {
     number: body.number,
   });
 
-  person.save().then((result) => {
-    res.status(201).json(result.toJSON());
-  });
+  person
+    .save()
+    .then((result) => {
+      res.status(201).json(result.toJSON());
+    })
+    .catch((error) => next(error));
 });
 
 app.delete("/api/persons/:id", (req, res) => {
@@ -101,12 +105,7 @@ app.delete("/api/persons/:id", (req, res) => {
       console.log("Deleted successfully : ", result);
       return res.status(204).end();
     })
-    .catch((err) => {
-      console.log("Error deleting person: ", err);
-      return res.status(404).json({
-        error: "resource not found",
-      });
-    });
+    .catch((error) => next(error));
 });
 
 const catchAllEndpoints = (request, response) => {
@@ -114,6 +113,21 @@ const catchAllEndpoints = (request, response) => {
 };
 //Catch all undefined urls and raise 404
 app.use(catchAllEndpoints);
+
+const errorHandler = (error, request, response, next) => {
+  console.log("Error: ", error);
+  if (error.message === "Not Found") {
+    return response.status(404).json({ error: "resource not found" });
+  }
+  if (error.name === "CastError") {
+    return response
+      .status(400)
+      .json({ error: "Bad Request, the ID is malformatted" });
+  }
+
+  next(error);
+};
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
