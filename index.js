@@ -55,8 +55,30 @@ app.get("/api/persons/:id", (req, res) => {
 
 app.post("/api/persons", (req, res) => {
   const body = req.body;
+
+  if (!body.name) {
+    return res.status(400).json({
+      error: "missing required field `name`",
+    });
+  }
+
+  if (!body.number) {
+    return res.status(400).json({
+      error: "missing required field `number`",
+    });
+  }
+
+  const existing = persons.find((person) => person.name === body.name);
+
+  if (existing) {
+    return res.status(409).json({
+      error: `name '${body.name}' already exists`,
+    });
+  }
+
   body.id = parseInt(Math.random() * 100000);
   persons = persons.concat(body);
+
   res.status(201).json(body);
 });
 
