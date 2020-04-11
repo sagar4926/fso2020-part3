@@ -51,14 +51,15 @@ app.get("/api/persons", (req, res) => {
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (!person) {
-    return res.status(404).json({
-      error: "resource not found",
+  return Person.findById(req.params.id)
+    .then((result) => {
+      return res.json(result);
+    })
+    .catch((err) => {
+      return res.status(404).json({
+        error: "resource not found",
+      });
     });
-  }
-  res.json(person);
 });
 
 app.post("/api/persons", (req, res) => {
@@ -76,18 +77,22 @@ app.post("/api/persons", (req, res) => {
     });
   }
 
-  const existing = persons.find((person) => person.name === body.name);
+  /* const existing = persons.find((person) => person.name === body.name);
 
   if (existing) {
     return res.status(409).json({
       error: `name '${body.name}' already exists`,
     });
-  }
+  } */
 
-  body.id = parseInt(Math.random() * 100000);
-  persons = persons.concat(body);
-
-  res.status(201).json(body);
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  });
+  
+  person.save().then((result) => {
+    res.status(201).json(result.toJSON());
+  });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
