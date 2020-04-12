@@ -1,10 +1,15 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 // env loaded by autoenv
 const url = process.env.MONGO_DB_URL;
-
 mongoose
-  .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  })
   .then((result) => {
     console.log("Connected to MongoDB");
   })
@@ -13,9 +18,10 @@ mongoose
   });
 
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: { type: String, required: true, unique: true },
+  number: { type: String, required: true },
 });
+personSchema.plugin(uniqueValidator);
 personSchema.set("toJSON", {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();

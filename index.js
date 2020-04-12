@@ -122,7 +122,6 @@ const catchAllEndpoints = (request, response) => {
 app.use(catchAllEndpoints);
 
 const errorHandler = (error, request, response, next) => {
-  console.log("Error: ", error);
   if (error.message === "Not Found") {
     return response.status(404).json({ error: "resource not found" });
   }
@@ -131,7 +130,12 @@ const errorHandler = (error, request, response, next) => {
       .status(400)
       .json({ error: "Bad Request, the ID is malformatted" });
   }
-
+  if(error.name === "ValidationError") {
+    return response
+      .status(400)
+      .json(error);
+  }
+  console.log("Error: ", error);
   next(error);
 };
 app.use(errorHandler);
