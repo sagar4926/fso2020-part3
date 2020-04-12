@@ -62,11 +62,16 @@ const App = () => {
       return;
     }
 
-    api__persons.create(created).then((data) => {
-      setPersons(persons.concat(data));
-      setNewPerson({ name: "", number: "" });
-      showSuccessNotification(`${data.name} added.`);
-    });
+    api__persons
+      .create(created)
+      .then((data) => {
+        setPersons(persons.concat(data));
+        setNewPerson({ name: "", number: "" });
+        showSuccessNotification(`${data.name} added.`);
+      })
+      .catch((error) => {
+        showErrorNotification(error.response.data.message)
+      });
   };
 
   const removePersonFromState = (person) => {
